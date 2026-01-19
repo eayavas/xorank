@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Results</title>
+    <style>
+        /* Shared Styles */
+        :root {
+          --bg-color: #111;
+          --text-color: #dddddd;
+          --accent-color: #ED904F;
+          --link-color: #004b45;
+        }
+
+        body {
+          background-color: var(--bg-color);
+          color: var(--text-color);
+          font-family: Menlo,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New,monospace,serif;
+          font-size: 16px;
+          margin: 0;
+          line-height: 1.6;
+          background-image:
+            linear-gradient(rgba(79, 237, 223, 0.05) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(79, 237, 223, 0.05) 1px, transparent 1px);
+          background-size: 20px 20px;
+        }
+
+        header, footer { padding: 1rem; text-align: center; }
+        header h1 { margin: 0; color: var(--accent-color); font-size: 2rem; }
+        
+        main { max-width: 700px; margin: auto; padding: 1.5rem; }
+        section { margin-bottom: 2rem; }
+        h2 {
+          font-size: 1.25rem; color: var(--accent-color);
+          border-bottom: 1px solid var(--accent-color);
+          padding-bottom: 0.2rem; margin-bottom: 1rem;
+        }
+
+        /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 0.5rem;
+            border-bottom: 1px solid #333;
+        }
+
+        th {
+            color: var(--accent-color);
+            text-transform: uppercase;
+            font-size: 0.8rem;
+        }
+
+        tr:hover {
+            background-color: rgba(237, 144, 79, 0.05);
+        }
+
+        .rank-col { width: 50px; color: #666; }
+        .rating-col { text-align: right; color: #7AC57A; }
+        .stats-col { text-align: right; font-size: 0.8rem; color: #999; }
+        
+        /* Back link styling */
+        .back-link {
+            display: block;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>SYSTEM_RESULTS</h1>
+    </header>
+
+    <main>
+        <a href="/" class="back-link">&lt; RETURN_TO_VOTING</a>
+
+        <section>
+            <h2>LEADERBOARD</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th class="rank-col">#</th>
+                        <th>NAME</th>
+                        <th class="stats-col">W / L</th>
+                        <th class="rating-col">RATING</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{range $index, $element := .}}
+                    <tr>
+                        <td class="rank-col">{{call $.PlusOne $index}}</td>
+                        <td>{{.Name}}</td>
+                        <td class="stats-col">{{.Wins}} / {{.Losses}}</td>
+                        <td class="rating-col">{{printf "%.1f" .Rating}}</td>
+                    </tr>
+                    {{end}}
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+</body>
+</html>

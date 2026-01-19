@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Essociete Browser Tier Voting</title>
+    <style>
+        :root {
+          --bg-color: #111;
+          --text-color: #dddddd;
+          --accent-color: #ED904F;
+          --link-color: #004b45;
+        }
+
+        body {
+          background-color: var(--bg-color);
+          color: var(--text-color);
+          font-family: Menlo,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New,monospace,serif;
+          font-size: 16px;
+          margin: 0;
+          line-height: 1.6;
+          background-image:
+            linear-gradient(rgba(79, 237, 223, 0.05) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(79, 237, 223, 0.05) 1px, transparent 1px);
+          background-size: 20px 20px;
+        }
+
+        header, footer { padding: 1rem; text-align: center; }
+        header h1 { margin: 0; color: var(--accent-color); font-size: 2rem; }
+        
+        nav {
+          max-width: 750px; background: transparent; display: flex;
+          margin: auto; flex-wrap: wrap; justify-content: center; gap: 1rem; padding: 0rem;
+        }
+
+        nav a {
+          color: var(--bg-color); background: var(--accent-color);
+          font-weight: bold; padding: 0rem 0.5rem; text-decoration: none;
+        }
+
+        nav a:hover { color: var(--text-color); background-color: #bd733f; text-decoration: none; }
+        
+        main { max-width: 700px; margin: auto; padding: 1.5rem; }
+        section { margin-bottom: 2rem; }
+        h2 {
+          font-size: 1.25rem; color: var(--accent-color);
+          border-bottom: 1px solid var(--accent-color);
+          padding-bottom: 0.2rem; margin-bottom: 1rem;
+        }
+        
+        footer { font-size: 0.9rem; color: #999; }
+
+        .vote-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: stretch;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .vote-card {
+            flex: 1;
+            border: 1px solid #333;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 1.5rem;
+            text-align: center;
+            /* position: relative; is crucial for z-index layering */
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .vote-card:hover {
+            border-color: var(--accent-color);
+            background: rgba(237, 144, 79, 0.05); 
+        }
+
+        .vote-card h3 {
+            margin-top: 0;
+            font-size: 1.5rem;
+            color: #fff;
+        }
+
+        .stats {
+            font-size: 0.85rem;
+            color: #999;
+            margin-top: 1rem;
+            border-top: 1px dashed #444;
+            padding-top: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .vs-separator {
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+            color: var(--accent-color);
+            font-size: 1.2rem;
+        }
+
+        /* Invisible Vote Button (Layer 1) */
+        .card-btn {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 1;
+        }
+
+        /* Google Search Button (Layer 2 - Top) */
+        .search-btn {
+            position: relative; /* Stacks above absolute if z-index is higher */
+            z-index: 10;
+            display: inline-block;
+            font-size: 0.7rem;
+            color: var(--accent-color);
+            border: 1px solid var(--accent-color);
+            padding: 0.2rem 0.5rem;
+            text-decoration: none;
+            background: rgba(0,0,0,0.6);
+            transition: all 0.2s;
+            margin-top: 0.5rem;
+        }
+        
+        .search-btn:hover {
+            background: var(--accent-color);
+            color: #111;
+        }
+
+        @media (max-width: 600px) {
+            .vote-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-container"></div>
+        <h1>Essociete Browser Tier Voting</h1>
+    </header>
+
+    <nav>
+        <a href="/">VOTE</a>
+        <a href="/results">RANKINGS</a> <a href="#">ABOUT</a>
+    </nav>
+
+    <main>
+        <section>
+            <h2>CURRENT_MATCHUP</h2>
+            <p style="text-indent: 0;">Select the superior technology for you</p>
+            
+            <div class="vote-container">
+                <div class="vote-card">
+                    <form action="/vote" method="POST">
+                        <input type="hidden" name="winner" value="{{.Left.ID}}">
+                        <input type="hidden" name="loser" value="{{.Right.ID}}">
+                        
+                        <h3>{{.Left.Name}}</h3>
+                        <div class="stats">
+                            RATING: {{printf "%.0f" .Left.Rating}}<br>
+                            WINS: {{.Left.Wins}}
+                        </div>
+                        
+                        <button type="submit" class="card-btn"></button>
+                    </form>
+                    
+                    <a href="https://www.google.com/search?q={{.Left.Name}}+browser&tbm=isch" target="_blank" class="search-btn">
+                        [IMG_SEARCH]
+                    </a>
+                </div>
+
+                <div class="vs-separator">VS</div>
+
+                <div class="vote-card">
+                    <form action="/vote" method="POST">
+                        <input type="hidden" name="winner" value="{{.Right.ID}}">
+                        <input type="hidden" name="loser" value="{{.Left.ID}}">
+                        
+                        <h3>{{.Right.Name}}</h3>
+                        <div class="stats">
+                            RATING: {{printf "%.0f" .Right.Rating}}<br>
+                            WINS: {{.Right.Wins}}
+                        </div>
+                        
+                        <button type="submit" class="card-btn"></button>
+                    </form>
+
+                     <a href="https://www.google.com/search?q={{.Right.Name}}+browser&tbm=isch" target="_blank" class="search-btn">
+                        [IMG_SEARCH]
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Description</h2>
+            <p>This website allows users to vote on their preferred web browsers using the Elo rating system to rank them. 
+                Your votes help determine the popularity and performance of each browser in head-to-head matchups.
+                There are many browsers available, each with its own strengths and weaknesses and you might not be familiar with all of them.
+                It's important to make some research before voting to ensure informed decisions.
+            </p>
+        </section>
+    </main>
+
+    <footer>
+        <cite>Elo Algorithm v1.0 @eayavas 2026</cite>
+    </footer>
+
+</body>
+</html>
