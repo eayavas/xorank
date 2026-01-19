@@ -9,6 +9,5 @@ type Item struct {
 }
 
 type User struct {
-	Username string
-	Password string
+	Passcode string
 }

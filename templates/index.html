@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Essociete Browser Tier Voting</title>
     <style>
+        /* SENİN VERDİĞİN CSS AYNEN KORUNDU */
         :root {
           --bg-color: #111;
           --text-color: #dddddd;
@@ -64,8 +65,7 @@
             background: rgba(255, 255, 255, 0.02);
             padding: 1.5rem;
             text-align: center;
-            /* position: relative; is crucial for z-index layering */
-            position: relative;
+            position: relative; /* crucial for z-index layering */
             transition: all 0.2s ease;
         }
 
@@ -138,60 +138,82 @@
     <header>
         <div class="logo-container"></div>
         <h1>Essociete Browser Tier Voting</h1>
+        
+        <div style="font-size: 0.8rem; color: #666; margin-top: 0.5rem;">
+            ID: <span style="color: var(--accent-color);">{{.User}}</span> | 
+            <a href="/logout" style="color: #666; text-decoration: underline;">TERMINATE</a>
+        </div>
     </header>
 
     <nav>
         <a href="/">VOTE</a>
-        <a href="/results">RANKINGS</a> <a href="#">ABOUT</a>
+        <a href="/results">RANKINGS</a>
+        <a href="#">ABOUT</a>
     </nav>
 
     <main>
-        <section>
-            <h2>CURRENT_MATCHUP</h2>
-            <p style="text-indent: 0;">Select the superior technology for you</p>
-            
-            <div class="vote-container">
-                <div class="vote-card">
-                    <form action="/vote" method="POST">
-                        <input type="hidden" name="winner" value="{{.Left.ID}}">
-                        <input type="hidden" name="loser" value="{{.Right.ID}}">
+        {{if .Finished}}
+            <section style="text-align: center; padding-top: 2rem;">
+                <h2 style="border:none;">MISSION COMPLETE</h2>
+                <p style="text-indent: 0; font-size: 1.2rem; color: #7AC57A;">
+                    All available matchups have been processed.
+                </p>
+                <p style="text-indent: 0;">
+                    Your contributions have been recorded in the system.
+                </p>
+                <br>
+                <a href="/results" class="search-btn" style="font-size: 1rem; padding: 1rem 2rem;">
+                    VIEW FINAL RANKINGS
+                </a>
+            </section>
+        {{else}}
+            <section>
+                <h2>CURRENT_MATCHUP</h2>
+                <p style="text-indent: 0;">Select the superior technology for you</p>
+                
+                <div class="vote-container">
+                    <div class="vote-card">
+                        <form action="/vote" method="POST">
+                            <input type="hidden" name="winner" value="{{.Left.ID}}">
+                            <input type="hidden" name="loser" value="{{.Right.ID}}">
+                            
+                            <h3>{{.Left.Name}}</h3>
+                            <div class="stats">
+                                RATING: {{printf "%.0f" .Left.Rating}}<br>
+                                WINS: {{.Left.Wins}}
+                            </div>
+                            
+                            <button type="submit" class="card-btn"></button>
+                        </form>
                         
-                        <h3>{{.Left.Name}}</h3>
-                        <div class="stats">
-                            RATING: {{printf "%.0f" .Left.Rating}}<br>
-                            WINS: {{.Left.Wins}}
-                        </div>
-                        
-                        <button type="submit" class="card-btn"></button>
-                    </form>
-                    
-                    <a href="https://www.google.com/search?q={{.Left.Name}}+browser&tbm=isch" target="_blank" class="search-btn">
-                        [IMG_SEARCH]
-                    </a>
+                        <a href="https://www.google.com/search?q={{.Left.Name}}+browser&tbm=isch" target="_blank" class="search-btn">
+                            [IMG_SEARCH]
+                        </a>
+                    </div>
+
+                    <div class="vs-separator">VS</div>
+
+                    <div class="vote-card">
+                        <form action="/vote" method="POST">
+                            <input type="hidden" name="winner" value="{{.Right.ID}}">
+                            <input type="hidden" name="loser" value="{{.Left.ID}}">
+                            
+                            <h3>{{.Right.Name}}</h3>
+                            <div class="stats">
+                                RATING: {{printf "%.0f" .Right.Rating}}<br>
+                                WINS: {{.Right.Wins}}
+                            </div>
+                            
+                            <button type="submit" class="card-btn"></button>
+                        </form>
+
+                        <a href="https://www.google.com/search?q={{.Right.Name}}+browser&tbm=isch" target="_blank" class="search-btn">
+                            [IMG_SEARCH]
+                        </a>
+                    </div>
                 </div>
-
-                <div class="vs-separator">VS</div>
-
-                <div class="vote-card">
-                    <form action="/vote" method="POST">
-                        <input type="hidden" name="winner" value="{{.Right.ID}}">
-                        <input type="hidden" name="loser" value="{{.Left.ID}}">
-                        
-                        <h3>{{.Right.Name}}</h3>
-                        <div class="stats">
-                            RATING: {{printf "%.0f" .Right.Rating}}<br>
-                            WINS: {{.Right.Wins}}
-                        </div>
-                        
-                        <button type="submit" class="card-btn"></button>
-                    </form>
-
-                     <a href="https://www.google.com/search?q={{.Right.Name}}+browser&tbm=isch" target="_blank" class="search-btn">
-                        [IMG_SEARCH]
-                    </a>
-                </div>
-            </div>
-        </section>
+            </section>
+        {{end}}
 
         <section>
             <h2>Description</h2>

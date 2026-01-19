@@ -3,6 +3,7 @@ package store
 import (
 	"database/sql"
 	"log"
+
 	"xorank/internal/models"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -31,27 +32,28 @@ func NewStorage(path string) (*Storage, error) {
 
 func (s *Storage) initSchema() {
 	queries := []string{
-		`CREATE TABLE IF NOT EXISTS users (username TEXT PRIMARY KEY, password TEXT);`,
+		`CREATE TABLE IF NOT EXISTS users (passcode TEXT PRIMARY KEY);`,
 		`CREATE TABLE IF NOT EXISTS items (id TEXT PRIMARY KEY, name TEXT, rating REAL, wins INT, losses INT);`,
-		`CREATE TABLE IF NOT EXISTS votes (username TEXT, pair_key TEXT, PRIMARY KEY (username, pair_key));`,
+		`CREATE TABLE IF NOT EXISTS votes (passcode TEXT, pair_key TEXT, PRIMARY KEY (passcode, pair_key));`,
 	}
 
 	for _, q := range queries {
 		if _, err := s.DB.Exec(q); err != nil {
-			log.Printf("Table creation error: %v", err)
+			log.Printf("Tablo hatası: %v", err)
 		}
 	}
 }
 
 func (s *Storage) seedData() {
-	// Users
-	users := map[string]string{
-		"efe":   "1234",
-		"guest": "0000",
-		"admin": "root",
+	// sample codes
+	passcodes := []string{
+		"1234",  // Test
+		"admin", // Admin
+		"7777",  // Lucky
+		"0000",  // Guest
 	}
-	for u, p := range users {
-		s.DB.Exec("INSERT OR IGNORE INTO users (username, password) VALUES (?, ?)", u, p)
+	for _, p := range passcodes {
+		s.DB.Exec("INSERT OR IGNORE INTO users (passcode) VALUES (?)", p)
 	}
 
 	// Items
@@ -76,18 +78,16 @@ func (s *Storage) seedData() {
 		s.DB.Exec("INSERT INTO items (id, name, rating, wins, losses) VALUES (?, ?, ?, ?, ?)",
 			item.ID, item.Name, item.Rating, 0, 0)
 	}
-	log.Println("Database is ready with seed data.")
+	log.Println("DB init complete: Single Passcode Auth Mode.")
 }
 
 // --- METHODS ---
 
-func (s *Storage) GetUser(username, password string) bool {
-	var storedPass string
-	err := s.DB.QueryRow("SELECT password FROM users WHERE username = ?", username).Scan(&storedPass)
-	if err != nil {
-		return false
-	}
-	return storedPass == password
+// CheckPasscode checks if the passcode is valid
+func (s *Storage) CheckPasscode(code string) bool {
+	var exists int
+	err := s.DB.QueryRow("SELECT 1 FROM users WHERE passcode = ?", code).Scan(&exists)
+	return err == nil && exists == 1
 }
 
 func (s *Storage) GetAllItems() ([]*models.Item, error) {
@@ -108,19 +108,19 @@ func (s *Storage) GetAllItems() ([]*models.Item, error) {
 	return items, nil
 }
 
-func (s *Storage) HasVoted(username, pairKey string) bool {
+func (s *Storage) HasVoted(passcode, pairKey string) bool {
 	var count int
-	s.DB.QueryRow("SELECT COUNT(*) FROM votes WHERE username = ? AND pair_key = ?", username, pairKey).Scan(&count)
+	s.DB.QueryRow("SELECT COUNT(*) FROM votes WHERE passcode = ? AND pair_key = ?", passcode, pairKey).Scan(&count)
 	return count > 0
 }
 
-func (s *Storage) SaveVote(username, pairKey string, winner, loser *models.Item) error {
+func (s *Storage) SaveVote(passcode, pairKey string, winner, loser *models.Item) error {
 	tx, err := s.DB.Begin()
 	if err != nil {
 		return err
 	}
 
-	if _, err = tx.Exec("INSERT INTO votes (username, pair_key) VALUES (?, ?)", username, pairKey); err != nil {
+	if _, err = tx.Exec("INSERT INTO votes (passcode, pair_key) VALUES (?, ?)", passcode, pairKey); err != nil {
 		tx.Rollback()
 		return err
 	}

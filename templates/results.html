@@ -3,22 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Results</title>
+    <title>XORANK // RANKINGS</title>
     <style>
-        /* Shared Styles */
         :root {
           --bg-color: #111;
           --text-color: #dddddd;
           --accent-color: #ED904F;
-          --link-color: #004b45;
         }
 
         body {
           background-color: var(--bg-color);
           color: var(--text-color);
-          font-family: Menlo,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New,monospace,serif;
+          font-family: Menlo,Monaco,Lucida Console,Liberation Mono,Courier New,monospace;
           font-size: 16px;
           margin: 0;
+          padding: 2rem;
           line-height: 1.6;
           background-image:
             linear-gradient(rgba(79, 237, 223, 0.05) 1px, transparent 1px),
@@ -26,85 +25,137 @@
           background-size: 20px 20px;
         }
 
-        header, footer { padding: 1rem; text-align: center; }
-        header h1 { margin: 0; color: var(--accent-color); font-size: 2rem; }
-        
-        main { max-width: 700px; margin: auto; padding: 1.5rem; }
-        section { margin-bottom: 2rem; }
-        h2 {
-          font-size: 1.25rem; color: var(--accent-color);
-          border-bottom: 1px solid var(--accent-color);
-          padding-bottom: 0.2rem; margin-bottom: 1rem;
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
         }
 
-        /* Table Styles */
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #333;
+            padding-bottom: 1rem;
+        }
+
+        h1 {
+            color: var(--accent-color);
+            margin: 0;
+            font-size: 2rem;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            color: #7AC57A; /* Yeşil, "Geri Dön" için pozitif renk */
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+            color: #5FA35F;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid #333;
         }
 
         th, td {
             text-align: left;
-            padding: 0.5rem;
+            padding: 1rem;
             border-bottom: 1px solid #333;
         }
 
         th {
             color: var(--accent-color);
-            text-transform: uppercase;
             font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: rgba(0, 0, 0, 0.3);
         }
 
         tr:hover {
             background-color: rgba(237, 144, 79, 0.05);
         }
 
-        .rank-col { width: 50px; color: #666; }
-        .rating-col { text-align: right; color: #7AC57A; }
-        .stats-col { text-align: right; font-size: 0.8rem; color: #999; }
+        /* İlk 3 sırayı vurgulamak istersen (Opsiyonel) */
+        tr:nth-child(1) td { color: #FFD700; } /* Altın */
+        tr:nth-child(2) td { color: #C0C0C0; } /* Gümüş */
+        tr:nth-child(3) td { color: #CD7F32; } /* Bronz */
+        /* Normal renkler geri dönsün diye isim ve statları resetle */
+        tr:nth-child(-n+3) td:not(:first-child) { color: var(--text-color); }
+
+        .rating-col {
+            font-weight: bold;
+            color: var(--accent-color) !important;
+            text-align: right;
+        }
+
+        .stats-col {
+            text-align: right;
+            color: #666 !important;
+            font-size: 0.8rem;
+        }
         
-        /* Back link styling */
-        .back-link {
-            display: block;
-            margin-bottom: 2rem;
-            font-size: 0.9rem;
+        .rank-col {
+            width: 50px;
+            color: #666;
+            text-align: center;
+        }
+
+        footer {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #666;
         }
     </style>
 </head>
 <body>
 
+<div class="container">
     <header>
-        <h1>SYSTEM_RESULTS</h1>
+        <h1>SYSTEM LEADERBOARD</h1>
     </header>
 
-    <main>
-        <a href="/" class="back-link">&lt; RETURN_TO_VOTING</a>
+    <a href="/" class="back-link">&lt; RETURN_TO_VOTING</a>
 
-        <section>
-            <h2>LEADERBOARD</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th class="rank-col">#</th>
-                        <th>NAME</th>
-                        <th class="stats-col">W / L</th>
-                        <th class="rating-col">RATING</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {{range $index, $element := .}}
-                    <tr>
-                        <td class="rank-col">{{call $.PlusOne $index}}</td>
-                        <td>{{.Name}}</td>
-                        <td class="stats-col">{{.Wins}} / {{.Losses}}</td>
-                        <td class="rating-col">{{printf "%.1f" .Rating}}</td>
-                    </tr>
-                    {{end}}
-                </tbody>
-            </table>
-        </section>
-    </main>
+    <table>
+        <thead>
+            <tr>
+                <th class="rank-col">#</th>
+                <th>BROWSER / ENTITY</th>
+                <th class="stats-col">WINS / LOSSES</th>
+                <th class="rating-col">ELO RATING</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{range $index, $element := .}}
+            <tr>
+                <td class="rank-col">{{call $.PlusOne $index}}</td>
+                
+                <td>{{.Name}}</td>
+                
+                <td class="stats-col">
+                    {{.Wins}} W / {{.Losses}} L
+                </td>
+                
+                <td class="rating-col">
+                    {{printf "%.1f" .Rating}}
+                </td>
+            </tr>
+            {{end}}
+        </tbody>
+    </table>
+
+    <footer>
+        <cite>Live Data // XORANK System</cite>
+    </footer>
+</div>
 
 </body>
 </html>

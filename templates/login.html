@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XORANK :: AUTH</title>
+    <style>
+        /* ORİJİNAL CYBERCORE CSS */
+        :root { 
+            --bg: #050505; 
+            --text: #ddd; 
+            --accent: #ED904F; 
+            --err: #ff3333; 
+        }
+        
+        body { 
+            background: var(--bg); 
+            color: var(--text); 
+            font-family: monospace; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            height: 100vh; 
+            margin: 0; 
+        }
+
+        .login-box { 
+            border: 1px solid #333; 
+            padding: 2rem; 
+            width: 300px; 
+            background: rgba(255,255,255,0.02); 
+        }
+
+        h2 { 
+            color: var(--accent); 
+            margin-top: 0; 
+            text-align: center; 
+            border-bottom: 1px solid var(--accent); 
+            padding-bottom: 0.5rem; 
+        }
+
+        input { 
+            width: 100%; 
+            padding: 0.8rem; 
+            margin: 0.5rem 0; 
+            background: #111; 
+            border: 1px solid #444; 
+            color: white; 
+            box-sizing: border-box; 
+            font-family: monospace; 
+            text-align: center; /* Passcode için ortaladım, daha şık durur */
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+        }
+
+        input:focus { 
+            border-color: var(--accent); 
+            outline: none; 
+        }
+
+        button { 
+            width: 100%; 
+            padding: 0.8rem; 
+            background: var(--accent); 
+            border: none; 
+            font-weight: bold; 
+            cursor: pointer; 
+            margin-top: 1rem; 
+        }
+
+        button:hover { 
+            opacity: 0.9; 
+        }
+
+        .error { 
+            color: var(--err); 
+            font-size: 0.8rem; 
+            text-align: center; 
+            margin-top: 1rem; 
+        }
+        
+        .hint {
+            font-size: 0.7rem;
+            color: #555;
+            text-align: center;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <h2>SYSTEM ACCESS</h2>
+        
+        <form method="POST">
+            <input type="password" name="passcode" placeholder="ENTER PASSCODE" required autofocus autocomplete="off">
+            
+            <button type="submit">INITIALIZE SESSION</button>
+        </form>
+        
+        {{if .}}<div class="error">ACCESS DENIED: {{.}}</div>{{end}}
+        
+        <div class="hint">SECURE TERMINAL // XORANK v1.0</div>
+    </div>
+</body>
+</html>

@@ -19,7 +19,6 @@ var (
 )
 
 func main() {
-	// 1. Initialize Database
 	var err error
 	db, err = store.NewStorage("./elo.db")
 	if err != nil {
@@ -27,19 +26,16 @@ func main() {
 	}
 	defer db.DB.Close()
 
-	// 2. Load Templates
 	funcMap := template.FuncMap{"PlusOne": func(i int) int { return i + 1 }}
-	// Template path is set assuming the project will be run from the root directory
 	tmpl = template.Must(template.New("").Funcs(funcMap).ParseGlob("templates/*.html"))
 
-	// 3. Routes
 	http.HandleFunc("/login", handleLogin)
 	http.HandleFunc("/logout", handleLogout)
 	http.HandleFunc("/", authMiddleware(handleIndex))
 	http.HandleFunc("/vote", authMiddleware(handleVote))
 	http.HandleFunc("/results", authMiddleware(handleResults))
 
-	log.Println("XORANK SYSTEMS ONLINE: http://localhost:8080")
+	log.Println("XORANK ONLINE: http://localhost:8080")
 	http.ListenAndServe(":8080", nil)
 }
 
@@ -50,21 +46,20 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 		tmpl.ExecuteTemplate(w, "login.html", nil)
 		return
 	}
-	user := r.FormValue("username")
-	pass := r.FormValue("password")
+	code := r.FormValue("passcode")
 
-	if db.GetUser(user, pass) {
+	if db.CheckPasscode(code) {
 		http.SetCookie(w, &http.Cookie{
-			Name: "session_user", Value: user, Expires: time.Now().Add(24 * time.Hour), Path: "/",
+			Name: "xorank_auth", Value: code, Expires: time.Now().Add(24 * time.Hour), Path: "/",
 		})
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 	} else {
-		tmpl.ExecuteTemplate(w, "login.html", "ACCESS DENIED")
+		tmpl.ExecuteTemplate(w, "login.html", "INVALID PASSCODE")
 	}
 }
 
 func handleLogout(w http.ResponseWriter, r *http.Request) {
-	http.SetCookie(w, &http.Cookie{Name: "session_user", MaxAge: -1})
+	http.SetCookie(w, &http.Cookie{Name: "xorank_auth", MaxAge: -1})
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }
 
@@ -80,21 +75,19 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	username := getUserFromCookie(r)
+	passcode := getUserFromCookie(r)
 	items, _ := db.GetAllItems()
 
-	// Shuffle
 	rand.Seed(time.Now().UnixNano())
 	rand.Shuffle(len(items), func(i, j int) { items[i], items[j] = items[j], items[i] })
 
 	var left, right *models.Item
 	found := false
 
-	// Find first unvoted pair
 	for i := 0; i < len(items); i++ {
 		for j := i + 1; j < len(items); j++ {
 			pairKey := getPairKey(items[i].ID, items[j].ID)
-			if !db.HasVoted(username, pairKey) {
+			if !db.HasVoted(passcode, pairKey) {
 				left, right = items[i], items[j]
 				found = true
 				break
@@ -105,7 +98,7 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	tmpl.ExecuteTemplate(w, "index.html", PageData{Left: left, Right: right, Finished: !found, User: username})
+	tmpl.ExecuteTemplate(w, "index.html", PageData{Left: left, Right: right, Finished: !found, User: passcode})
 }
 
 func handleVote(w http.ResponseWriter, r *http.Request) {
@@ -114,17 +107,16 @@ func handleVote(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	username := getUserFromCookie(r)
+	passcode := getUserFromCookie(r)
 	winnerID := r.FormValue("winner")
 	loserID := r.FormValue("loser")
 	pairKey := getPairKey(winnerID, loserID)
 
-	if db.HasVoted(username, pairKey) {
-		http.Redirect(w, r, "/", http.StatusSeeOther) // If already voted, redirect to home
+	if db.HasVoted(passcode, pairKey) {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
 
-	// Get updated values for calculation
 	items, _ := db.GetAllItems()
 	var winner, loser *models.Item
 	for _, i := range items {
@@ -138,7 +130,7 @@ func handleVote(w http.ResponseWriter, r *http.Request) {
 
 	if winner != nil && loser != nil {
 		logic.Calculate(winner, loser)
-		db.SaveVote(username, pairKey, winner, loser)
+		db.SaveVote(passcode, pairKey, winner, loser)
 	}
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
@@ -146,12 +138,9 @@ func handleVote(w http.ResponseWriter, r *http.Request) {
 
 func handleResults(w http.ResponseWriter, r *http.Request) {
 	items, _ := db.GetAllItems()
-
-	// Sorting
 	sort.Slice(items, func(i, j int) bool {
 		return items[i].Rating > items[j].Rating
 	})
-
 	tmpl.ExecuteTemplate(w, "results.html", items)
 }
 
@@ -159,7 +148,7 @@ func handleResults(w http.ResponseWriter, r *http.Request) {
 
 func authMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		_, err := r.Cookie("session_user")
+		_, err := r.Cookie("xorank_auth")
 		if err != nil {
 			http.Redirect(w, r, "/login", http.StatusSeeOther)
 			return
@@ -169,7 +158,7 @@ func authMiddleware(next http.HandlerFunc) http.HandlerFunc {
 }
 
 func getUserFromCookie(r *http.Request) string {
-	c, _ := r.Cookie("session_user")
+	c, _ := r.Cookie("xorank_auth")
 	return c.Value
 }
 
