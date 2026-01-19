@@ -2,15 +2,15 @@
 
 > **XORank** is a minimalist pairwise comparison engine utilizing the Elo rating system.
 
-## 0x01 // Overview
+## Overview
 
 **XORank** is a project designed to rank items based on user preferences through one-on-one matchups. It functions as a lightweight clone of Facemash, powered by the Elo rating algorithm to ensure mathematical accuracy in ranking.
 
-Originally developed for the **Essociete** hackerspace, this tool was built to settle a competition finding the "Ultimate Web Browser" among members.
+Originally developed for the [**Essociete**](https://essociete.org) hackerspace, this tool was built to settle a competition finding the "Ultimate Web Browser" among members.
 
 **Etymology:** The name is a portmanteau of **XOR** (Exclusive OR logic gate - *choice between two*) and **Rank**.
 
-## 0x02 // Features
+## Features
 
 * **Elo Rating System:** Uses a standard logistic distribution (K=32) for dynamic scoring.
 * **Passcode Authentication:** Minimalist, username-free security using unique access codes.
@@ -19,14 +19,14 @@ Originally developed for the **Essociete** hackerspace, this tool was built to s
 * **Session Management:** Cookie-based sessions to track user votes and prevent duplicate entries for the same matchup.
 * **Responsive Design:** Optimized for both desktop terminals and mobile viewports.
 
-## 0x03 // Tech Stack
+## Tech Stack
 
 * **Language:** Go (Golang) 1.23+
 * **Database:** SQLite3
 * **Frontend:** HTML5 / CSS3 (Grid & Flexbox)
 * **Architecture:** Standard Go Project Layout (`cmd`, `internal`, `templates`)
 
-## 0x04 // Installation
+## Installation
 
 ### Prerequisites
 * **Go**: Version 1.23 or higher.
@@ -38,7 +38,7 @@ git clone [https://github.com/yourusername/xorank.git](https://github.com/yourus
 cd xorank
 ```
 
-## 0x05 // Usage
+## Usage
 
 ### First Run Setup
 
@@ -75,12 +75,12 @@ go run cmd/xorank/main.go
 
 ```
 
-## 0x06 // Configuration
+## Configuration
 
 To modify the default **Items** (Browsers) or **Access Codes**, edit the `seedData` function located in:
 `internal/store/sqlite.go`
 
-## 0x07 // Contributing
+## Contributing
 
 1. Fork the repository.
 2. Create your feature branch (`git checkout -b feature/AmazingFeature`).
@@ -88,13 +88,12 @@ To modify the default **Items** (Browsers) or **Access Codes**, edit the `seedDa
 4. Push to the branch (`git push origin feature/AmazingFeature`).
 5. Open a Pull Request.
 
-## 0x08 // License
+## License
 
 Distributed under the MIT License.
 
----
 
-*Developed with <3 by [eayavas*](https://github.com/eayavas)
+*Developed by [eayavas*](https://github.com/eayavas) for Essociete
 
 ```
 
