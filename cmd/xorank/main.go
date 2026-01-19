@@ -8,9 +8,9 @@ import (
 	"sort"
 	"time"
 
-	"xorank/internal/logic"
-	"xorank/internal/models"
-	"xorank/internal/store"
+	"github.com/eayavas/XORank/internal/logic"
+	"github.com/eayavas/XORank/internal/models"
+	"github.com/eayavas/XORank/internal/store"
 )
 
 var (

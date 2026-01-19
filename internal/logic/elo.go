@@ -2,7 +2,8 @@ package logic
 
 import (
 	"math"
-	"xorank/internal/models"
+
+	"github.com/eayavas/XORank/internal/models"
 )
 
 const KFactor = 32.0

@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"log"
 
-	"xorank/internal/models"
+	"github.com/eayavas/XORank/internal/models"
 
 	_ "github.com/mattn/go-sqlite3"
 )
