@@ -1,4 +1,4 @@
-module exorank
+module github.com/eayavas/XORank
 
 go 1.25.3
 
